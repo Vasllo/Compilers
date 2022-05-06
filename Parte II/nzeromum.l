@@ -2,45 +2,33 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include "nzeroum.tab.h"
-    //#ifdef YYDEBUG
-    int yydebug = 1;
-    //#endif
-    extern int yylval;
+    #include "nzeromum.tab.h"
 %}
 /* End Definitions */
 
+%option noyywrap
 /*--------------------------------------------------------------------------*/
 
 /* Rules */
 
 %%
-0 {
-    yylval=0; 
+
+0 { 
     return ZERO;
 }
 
 1 {
-    yylval=1; 
     return UM; 
 }
 
-\n {
-    return EOL;
-}
-
-quit|q|exit {
+quit|q|Q|exit {
     printf("-------------------------------------------------- EXITING... --------------------------------------------------\n");
-    exit(1);
+    exit(0);
 }
 
-. ;
+
 
 %%
 /* End Rules */
 
 /*--------------------------------------------------------------------------*/
-
-int yywrap() {
-    return 0;
-}

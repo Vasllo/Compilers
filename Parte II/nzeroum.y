@@ -4,14 +4,11 @@
     #include <stdlib.h>
     #include <string.h>
     
-    char *word;
+    char word[] = "\0";
     int n_zero = 0;
     int n_um = 0;
-    int is_equal = 0;
 
-    void inc_ns();
     void cat_word_1(int n1);
-    void cat_word_2(int n1, int n2);
     void head();
     void print_result(int result);
 
@@ -24,28 +21,36 @@
 
 /* Rules */
 %%
-stmt: A EOL {
-    print_result(n_um == n_zero);
-}
-A:  ZERO A UM { 
-        cat_word_2($1, $3); 
-        inc_ns(); 
-    }
-    | UM A ZERO { 
-        cat_word_2($1, $3); 
-        inc_ns(); 
-    }
-    | UM { 
-        cat_word_1($1); 
-        n_um++; 
-    }
-    | ZERO { 
-        cat_word_1($1); 
-        n_zero++; 
-    }
-    |
-    ;
 
+stmnt: A EOL {printf("Deu bom\n");} | {printf("Deu ruim\n");}
+
+A: ZERO UM |;
+
+
+/*',' {
+    printf("Passou linha A1\n");
+    print_result($$);
+    word[0] = '\0';
+    n_zero = 0;
+    n_um = 0; 
+}
+| ZERO A { 
+    printf("Passou linha A2\n");
+    cat_word_1($1); 
+    n_zero++;
+    $$ = n_um == n_zero;
+}
+| UM A { 
+    printf("Passou linha A3\n");
+    cat_word_1($1); 
+    n_um++;
+    $$ = n_um == n_zero;
+}
+|
+EOL {
+    printf("Passou linha A4\n");
+    print_result($$);
+}*/
 
 %%
 /* End Rules */
@@ -57,23 +62,13 @@ void yyerror(char *s)
     printf("ERROR -> %s\n", s);
 }
 
-void inc_ns(){
-    n_zero++;
-    n_um++;
-}
-
 void cat_word_1(int n1){
+    printf("Passou linha 80. n1=%d\n", n1);
     char n1_c = n1 + '0';
+    printf("Passou linha 82. n1=%c *word=%s\n", n1_c, word);
 
-    strncat(word, &n1_c, 1);
-}
-
-void cat_word_2(int n1, int n2){
-    char n1_c = n1 + '0';
-    char n2_c = n2 + '0';
-
-    strncat(word, &n1_c, 1);
-    strncat(word, &n2_c, 1); 
+    strcat(word, &n1_c);
+    printf("Passou linha 85. word=%s sizeof(word)=%lu\n", word, sizeof(word));
 }
 
 void head(){
@@ -89,7 +84,7 @@ void head(){
 
 void print_result(int result) {
     printf("%*.*s", 24, 1, word);
-    if (is_equal == 1)
+    if (result == 1)
         printf(" - Yes\n");
     else
         printf(" - No\n");
@@ -97,6 +92,10 @@ void print_result(int result) {
 
 int main()
 {
+    #ifdef YYDEBUG
+    yydebug = 1;
+    #endif
+    head();
     yyparse();
     return 0;
 }
